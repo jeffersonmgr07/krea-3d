@@ -68,6 +68,10 @@ button {
   padding-inline: 16px;
 }
 
+.icon-svg {
+  flex-shrink: 0;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -620,6 +624,14 @@ section {
   transform: translateY(-2px);
 }
 
+.social-pill .icon-svg.instagram {
+  color: #c1387d;
+}
+
+.social-pill .icon-svg.tiktok {
+  color: var(--krea-dark);
+}
+
 /* ==========================================================================
    FOOTER
    ========================================================================== */
@@ -656,6 +668,7 @@ section {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
+  gap: 6px;
 }
 
 .footer-copy {
