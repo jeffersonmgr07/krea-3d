@@ -1,47 +1,52 @@
 /* ==========================================================================
    KREA 3D — catálogo + carrito + pedido por WhatsApp
+   Actualización: Posavasos, Abrelatas y Llavero para foto
    ========================================================================== */
 
 // ---------------------------------------------------------------------------
 // 1) PRODUCTOS
-//
-// Para agregar un producto nuevo, copia un objeto y cambia sus valores.
-// - price: usa 0 mientras no tengas el precio final (se muestra "A coordinar").
-// - image: ruta al archivo dentro de assets/img/productos/. Si el archivo aún
-//   no existe, la tarjeta muestra automáticamente un ícono decorativo.
+// - price: usa 0 mientras el precio sea "A coordinar".
+// - images: permite una o varias fotos por producto.
 // ---------------------------------------------------------------------------
 const products = [
   {
-    id: "porta-administracion",
-    name: "Porta celular - Administración",
-    faculty: "Administración",
-    shortDescription: "Porta celular personalizado impreso en 3D con el sello de tu facultad.",
+    id: "posavasos",
+    name: "Posavasos 3D",
+    faculty: "Hogar & Diseño",
+    shortDescription:
+      "Posavasos impresos en 3D con diseños de gatos y diferentes estilos. Ideales para darle un toque original a tu espacio.",
     price: 0,
-    image: "./assets/img/productos/porta-administracion.webp",
+    images: [
+      "./assets/img/productos/posavasos-01.webp",
+      "./assets/img/productos/posavasos-02.webp",
+      "./assets/img/productos/posavasos-03.webp",
+      "./assets/img/productos/posavasos-04.webp",
+      "./assets/img/productos/posavasos-05.webp",
+      "./assets/img/productos/posavasos-07.webp",
+    ],
   },
   {
-    id: "porta-sociales",
-    name: "Porta celular - Sociales",
-    faculty: "Sociales",
-    shortDescription: "Personalízalo con el nombre de tu facultad o promoción.",
+    id: "abrelatas",
+    name: "Abrelatas 3D",
+    faculty: "Accesorios",
+    shortDescription:
+      "Abrelatas con diseño de flor, fabricado mediante impresión 3D. Práctico, compacto y con un diseño diferente.",
     price: 0,
-    image: "./assets/img/productos/porta-sociales.webp",
+    images: [
+      "./assets/img/productos/abrelatas-01.webp",
+    ],
   },
   {
-    id: "porta-ingenieria",
-    name: "Porta celular - Ingeniería",
-    faculty: "Ingeniería",
-    shortDescription: "Diseño resistente pensado para el día a día en el campus.",
+    id: "llavero-foto",
+    name: "Llavero para foto",
+    faculty: "Personalizados",
+    shortDescription:
+      "Llavero en forma de cámara con espacio para colocar una fotografía. Un detalle original para llevar tus recuerdos contigo.",
     price: 0,
-    image: "./assets/img/productos/porta-ingenieria.webp",
-  },
-  {
-    id: "porta-economia",
-    name: "Porta celular - Economía",
-    faculty: "Economía",
-    shortDescription: "Un accesorio único, hecho a tu medida en impresión 3D.",
-    price: 0,
-    image: "./assets/img/productos/porta-economia.webp",
+    images: [
+      "./assets/img/productos/llavero-foto-01.webp",
+      "./assets/img/productos/llavero-foto-02.webp",
+    ],
   },
 ];
 
@@ -77,7 +82,113 @@ const continueShoppingBtn = document.getElementById("continueShoppingBtn");
 const toastContainer = document.getElementById("toastContainer");
 
 // ---------------------------------------------------------------------------
-// 5) PERSISTENCIA (localStorage)
+// 5) ESTILOS DE GALERÍA
+// Se inyectan desde JS para que esta actualización solo requiera reemplazar
+// app.js y subir las nuevas imágenes.
+// ---------------------------------------------------------------------------
+function injectProductGalleryStyles() {
+  if (document.getElementById("kreaProductGalleryStyles")) return;
+
+  const style = document.createElement("style");
+  style.id = "kreaProductGalleryStyles";
+  style.textContent = `
+    .product-image-gallery {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .product-gallery-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .product-gallery-nav {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .product-gallery-btn {
+      pointer-events: auto;
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      color: var(--krea-wine, #770716);
+      box-shadow: 0 4px 14px rgba(0,0,0,.18);
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .product-gallery-counter {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      z-index: 4;
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: rgba(41,27,32,.78);
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+
+    .product-gallery-dots {
+      position: absolute;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+      z-index: 4;
+      display: flex;
+      gap: 5px;
+    }
+
+    .product-gallery-dot {
+      width: 6px;
+      height: 6px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,.6);
+      box-shadow: 0 1px 4px rgba(0,0,0,.25);
+    }
+
+    .product-gallery-dot.active {
+      background: #fff;
+      transform: scale(1.25);
+    }
+
+    @media (max-width: 639px) {
+      .product-image {
+        aspect-ratio: 4 / 5;
+      }
+
+      .product-gallery-btn {
+        width: 42px;
+        height: 42px;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// ---------------------------------------------------------------------------
+// 6) PERSISTENCIA (localStorage)
 // ---------------------------------------------------------------------------
 function isValidCartItem(item) {
   return (
@@ -97,11 +208,21 @@ function loadCart() {
   try {
     const saved = localStorage.getItem(CART_STORAGE_KEY);
     const parsed = saved ? JSON.parse(saved) : [];
-    cart = Array.isArray(parsed) ? parsed.filter(isValidCartItem) : [];
+    const validProductIds = new Set(products.map((product) => product.id));
+
+    // Elimina automáticamente productos antiguos que ya no existen.
+    cart = Array.isArray(parsed)
+      ? parsed
+          .filter(isValidCartItem)
+          .filter((item) => validProductIds.has(item.id))
+      : [];
+
+    saveCart();
   } catch {
     cart = [];
     localStorage.removeItem(CART_STORAGE_KEY);
   }
+
   updateCartUI();
 }
 
@@ -110,12 +231,21 @@ function saveCart() {
 }
 
 // ---------------------------------------------------------------------------
-// 6) RENDER DE PRODUCTOS
+// 7) UTILIDADES
 // ---------------------------------------------------------------------------
 function formatPrice(price) {
   return price > 0 ? `S/ ${price.toFixed(2)}` : "A coordinar";
 }
 
+function getProductMainImage(product) {
+  return Array.isArray(product.images) && product.images.length
+    ? product.images[0]
+    : "./assets/img/logo/krea3d-logo.jpg";
+}
+
+// ---------------------------------------------------------------------------
+// 8) RENDER DE PRODUCTOS
+// ---------------------------------------------------------------------------
 function renderProducts() {
   productsGrid.innerHTML = "";
 
@@ -124,25 +254,66 @@ function renderProducts() {
     card.className = "product-card";
 
     const priceClass = product.price > 0 ? "product-price" : "product-price tbd";
+    const images = Array.isArray(product.images) ? product.images : [];
+    const hasMultipleImages = images.length > 1;
 
     card.innerHTML = `
       <div class="product-image">
         <div class="product-image-placeholder">
           <span class="icon" aria-hidden="true">🧊</span>
-          <span class="label">Foto próximamente</span>
+          <span class="label">Krea 3D</span>
         </div>
-        <img
-          src="${product.image}"
-          alt="${product.name}"
-          loading="lazy"
-          width="400"
-          height="300"
-        />
+
+        <div class="product-image-gallery" data-product-id="${product.id}">
+          <img
+            class="product-gallery-img"
+            src="${getProductMainImage(product)}"
+            alt="${product.name}"
+            loading="lazy"
+            width="570"
+            height="760"
+            data-index="0"
+          />
+
+          ${
+            hasMultipleImages
+              ? `
+                <div class="product-gallery-nav">
+                  <button
+                    type="button"
+                    class="product-gallery-btn gallery-prev"
+                    aria-label="Foto anterior de ${product.name}"
+                  >‹</button>
+                  <button
+                    type="button"
+                    class="product-gallery-btn gallery-next"
+                    aria-label="Siguiente foto de ${product.name}"
+                  >›</button>
+                </div>
+
+                <div class="product-gallery-dots" aria-hidden="true">
+                  ${images
+                    .map(
+                      (_, index) =>
+                        `<span class="product-gallery-dot ${
+                          index === 0 ? "active" : ""
+                        }"></span>`
+                    )
+                    .join("")}
+                </div>
+
+                <span class="product-gallery-counter">1 / ${images.length}</span>
+              `
+              : ""
+          }
+        </div>
       </div>
+
       <div class="product-body">
         <span class="product-faculty">${product.faculty}</span>
         <h3 class="product-name">${product.name}</h3>
         <p class="product-desc">${product.shortDescription}</p>
+
         <div class="product-footer">
           <span class="${priceClass}">${formatPrice(product.price)}</span>
           <button type="button" class="btn-add" data-id="${product.id}">
@@ -152,14 +323,78 @@ function renderProducts() {
       </div>
     `;
 
-    const img = card.querySelector("img");
-    img.addEventListener("error", () => img.classList.add("is-hidden"), { once: true });
+    const galleryImg = card.querySelector(".product-gallery-img");
+
+    galleryImg.addEventListener(
+      "error",
+      () => {
+        galleryImg.classList.add("is-hidden");
+      },
+      { once: true }
+    );
+
+    if (hasMultipleImages) {
+      let currentIndex = 0;
+      const counter = card.querySelector(".product-gallery-counter");
+      const dots = [...card.querySelectorAll(".product-gallery-dot")];
+
+      const showImage = (newIndex) => {
+        currentIndex = (newIndex + images.length) % images.length;
+        galleryImg.src = images[currentIndex];
+        galleryImg.dataset.index = String(currentIndex);
+        counter.textContent = `${currentIndex + 1} / ${images.length}`;
+
+        dots.forEach((dot, index) => {
+          dot.classList.toggle("active", index === currentIndex);
+        });
+      };
+
+      card.querySelector(".gallery-prev").addEventListener("click", (event) => {
+        event.stopPropagation();
+        showImage(currentIndex - 1);
+      });
+
+      card.querySelector(".gallery-next").addEventListener("click", (event) => {
+        event.stopPropagation();
+        showImage(currentIndex + 1);
+      });
+
+      // Swipe simple para móviles.
+      let touchStartX = null;
+
+      card
+        .querySelector(".product-image-gallery")
+        .addEventListener(
+          "touchstart",
+          (event) => {
+            touchStartX = event.changedTouches[0].clientX;
+          },
+          { passive: true }
+        );
+
+      card
+        .querySelector(".product-image-gallery")
+        .addEventListener(
+          "touchend",
+          (event) => {
+            if (touchStartX === null) return;
+            const deltaX = event.changedTouches[0].clientX - touchStartX;
+
+            if (Math.abs(deltaX) > 45) {
+              showImage(currentIndex + (deltaX < 0 ? 1 : -1));
+            }
+
+            touchStartX = null;
+          },
+          { passive: true }
+        );
+    }
 
     productsGrid.appendChild(card);
   });
 
   productsGrid.querySelectorAll(".btn-add").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
+    btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-id");
       addToCart(id);
 
@@ -172,13 +407,14 @@ function renderProducts() {
 }
 
 // ---------------------------------------------------------------------------
-// 7) LÓGICA DEL CARRITO
+// 9) LÓGICA DEL CARRITO
 // ---------------------------------------------------------------------------
 function addToCart(productId) {
   const product = products.find((p) => p.id === productId);
   if (!product) return;
 
   const existing = cart.find((item) => item.key === productId);
+
   if (existing) {
     existing.qty += 1;
   } else {
@@ -188,7 +424,7 @@ function addToCart(productId) {
       name: product.name,
       faculty: product.faculty,
       price: product.price,
-      image: product.image,
+      image: getProductMainImage(product),
       qty: 1,
     });
   }
@@ -202,6 +438,7 @@ function updateQty(key, diff) {
   if (!item) return;
 
   item.qty += diff;
+
   if (item.qty <= 0) {
     cart = cart.filter((i) => i.key !== key);
   }
@@ -226,8 +463,8 @@ function updateCartUI() {
   const { totalItems, total } = getCartTotals();
 
   cartCountEl.textContent = totalItems;
-  cartAmountEl.textContent = `S/ ${total.toFixed(2)}`;
-  cartTotalEl.textContent = `S/ ${total.toFixed(2)}`;
+  cartAmountEl.textContent = total > 0 ? `S/ ${total.toFixed(2)}` : "Pedido";
+  cartTotalEl.textContent = total > 0 ? `S/ ${total.toFixed(2)}` : "A coordinar";
   checkoutBtn.disabled = cart.length === 0;
 
   cartItemsEl.innerHTML = "";
@@ -236,15 +473,29 @@ function updateCartUI() {
     cartItemsEl.innerHTML = `
       <div class="cart-empty">
         <div class="icon" aria-hidden="true">🛒</div>
-        <p>Tu carrito está vacío.<br />Agrega tus diseños favoritos y continúa tu pedido por WhatsApp.</p>
-        <button type="button" class="btn btn-outline" id="emptyCartViewProducts">Ver productos</button>
+        <p>
+          Tu carrito está vacío.<br />
+          Agrega tus diseños favoritos y continúa tu pedido por WhatsApp.
+        </p>
+        <button
+          type="button"
+          class="btn btn-outline"
+          id="emptyCartViewProducts"
+        >
+          Ver productos
+        </button>
       </div>
     `;
-    const viewProductsBtn = document.getElementById("emptyCartViewProducts");
-    viewProductsBtn.addEventListener("click", () => {
-      closeCart();
-      document.getElementById("productos").scrollIntoView({ behavior: "smooth" });
-    });
+
+    document
+      .getElementById("emptyCartViewProducts")
+      .addEventListener("click", () => {
+        closeCart();
+        document
+          .getElementById("productos")
+          .scrollIntoView({ behavior: "smooth" });
+      });
+
     return;
   }
 
@@ -257,18 +508,41 @@ function updateCartUI() {
         <span aria-hidden="true">🧊</span>
         <img src="${item.image}" alt="${item.name}" />
       </div>
+
       <div class="cart-item-main">
         <div class="cart-item-name">${item.name}</div>
         <div class="cart-item-faculty">${item.faculty}</div>
         <div class="cart-item-price">${formatPrice(item.price)} c/u</div>
       </div>
+
       <div class="cart-item-actions">
         <div class="qty-controls">
-          <button type="button" class="qty-btn" data-key="${item.key}" data-action="minus" aria-label="Disminuir cantidad">−</button>
+          <button
+            type="button"
+            class="qty-btn"
+            data-key="${item.key}"
+            data-action="minus"
+            aria-label="Disminuir cantidad"
+          >−</button>
+
           <span class="qty-number">${item.qty}</span>
-          <button type="button" class="qty-btn" data-key="${item.key}" data-action="plus" aria-label="Aumentar cantidad">+</button>
+
+          <button
+            type="button"
+            class="qty-btn"
+            data-key="${item.key}"
+            data-action="plus"
+            aria-label="Aumentar cantidad"
+          >+</button>
         </div>
-        <button type="button" class="remove-btn" data-key="${item.key}">Quitar</button>
+
+        <button
+          type="button"
+          class="remove-btn"
+          data-key="${item.key}"
+        >
+          Quitar
+        </button>
       </div>
     `;
 
@@ -294,7 +568,7 @@ function updateCartUI() {
 }
 
 // ---------------------------------------------------------------------------
-// 8) ABRIR / CERRAR CARRITO
+// 10) ABRIR / CERRAR CARRITO
 // ---------------------------------------------------------------------------
 function openCart() {
   lastFocusedElement = document.activeElement;
@@ -310,31 +584,35 @@ function closeCart() {
   cartPanel.classList.remove("open");
   document.body.classList.remove("no-scroll");
   cartPanel.setAttribute("aria-hidden", "true");
-  if (lastFocusedElement) lastFocusedElement.focus();
+
+  if (lastFocusedElement) {
+    lastFocusedElement.focus();
+  }
 }
 
 headerCartBtn.addEventListener("click", openCart);
 cartCloseBtn.addEventListener("click", closeCart);
 cartBackdrop.addEventListener("click", closeCart);
+
 continueShoppingBtn.addEventListener("click", () => {
   closeCart();
   document.getElementById("productos").scrollIntoView({ behavior: "smooth" });
 });
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && cartPanel.classList.contains("open")) {
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && cartPanel.classList.contains("open")) {
     closeCart();
   }
 });
 
 function bumpCartButton() {
   headerCartBtn.classList.remove("bump");
-  void headerCartBtn.offsetWidth; // reflow para reiniciar animación
+  void headerCartBtn.offsetWidth;
   headerCartBtn.classList.add("bump");
 }
 
 // ---------------------------------------------------------------------------
-// 9) MENSAJE DE WHATSAPP
+// 11) MENSAJE DE WHATSAPP
 // ---------------------------------------------------------------------------
 function buildWhatsAppMessage() {
   const lines = [];
@@ -345,17 +623,28 @@ function buildWhatsAppMessage() {
 
   cart.forEach((item) => {
     const subtotal = item.price * item.qty;
-    lines.push(`• ${item.name} (${item.faculty})`);
+
+    lines.push(`• ${item.name}`);
     lines.push(`  Cantidad: ${item.qty}`);
     lines.push(`  Precio: ${formatPrice(item.price)}`);
-    lines.push(`  Subtotal: ${item.price > 0 ? `S/ ${subtotal.toFixed(2)}` : "A coordinar"}`);
+
+    if (item.price > 0) {
+      lines.push(`  Subtotal: S/ ${subtotal.toFixed(2)}`);
+    }
+
     lines.push("");
   });
 
   const { total } = getCartTotals();
-  lines.push(`Total referencial: S/ ${total.toFixed(2)}`);
-  lines.push("");
-  lines.push("¿Me ayudan a coordinar disponibilidad, personalización, pago y entrega?");
+
+  if (total > 0) {
+    lines.push(`Total referencial: S/ ${total.toFixed(2)}`);
+    lines.push("");
+  }
+
+  lines.push(
+    "¿Me ayudan a coordinar disponibilidad, personalización, pago y entrega?"
+  );
 
   return lines.join("\n");
 }
@@ -365,11 +654,12 @@ checkoutBtn.addEventListener("click", () => {
 
   const encodedMessage = encodeURIComponent(buildWhatsAppMessage());
   const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodedMessage}`;
+
   window.open(url, "_blank", "noopener,noreferrer");
 });
 
 // ---------------------------------------------------------------------------
-// 10) TOAST
+// 12) TOAST
 // ---------------------------------------------------------------------------
 function showToast(message) {
   const toast = document.createElement("div");
@@ -386,7 +676,7 @@ function showToast(message) {
 }
 
 // ---------------------------------------------------------------------------
-// 11) DESTELLOS (burst) — identidad Krea 3D: vino, celeste, amarillo
+// 13) DESTELLOS — identidad Krea 3D
 // ---------------------------------------------------------------------------
 function createBurst(x, y) {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -400,17 +690,17 @@ function createBurst(x, y) {
   const particles = 18;
 
   for (let i = 0; i < particles; i++) {
-    const p = document.createElement("span");
+    const particle = document.createElement("span");
     const angle = ((2 * Math.PI) / particles) * i;
     const distance = 55 + Math.random() * 45;
-    const tx = Math.cos(angle) * distance;
-    const ty = Math.sin(angle) * distance;
 
-    p.style.setProperty("--tx", `${tx}px`);
-    p.style.setProperty("--ty", `${ty}px`);
-    p.classList.add(colors[Math.floor(Math.random() * colors.length)]);
+    particle.style.setProperty("--tx", `${Math.cos(angle) * distance}px`);
+    particle.style.setProperty("--ty", `${Math.sin(angle) * distance}px`);
+    particle.classList.add(
+      colors[Math.floor(Math.random() * colors.length)]
+    );
 
-    burst.appendChild(p);
+    burst.appendChild(particle);
   }
 
   document.body.appendChild(burst);
@@ -418,8 +708,14 @@ function createBurst(x, y) {
 }
 
 // ---------------------------------------------------------------------------
-// 12) INICIALIZAR
+// 14) INICIALIZAR
 // ---------------------------------------------------------------------------
-document.getElementById("year").textContent = new Date().getFullYear();
+injectProductGalleryStyles();
+
+const yearEl = document.getElementById("year");
+if (yearEl) {
+  yearEl.textContent = new Date().getFullYear();
+}
+
 loadCart();
 renderProducts();

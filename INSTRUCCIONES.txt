@@ -1,0 +1,22 @@
+KREA 3D — actualización de productos
+
+Archivos incluidos:
+- js/app.js
+- assets/img/productos/*.webp
+
+Cómo subir a GitHub:
+1. Abre el repositorio jeffersonmgr07/krea-3d.
+2. Reemplaza el archivo js/app.js por el de esta carpeta.
+3. Sube todos los archivos .webp a assets/img/productos/.
+4. No necesitas modificar index.html ni css/styles.css.
+5. Confirma el commit en la rama main.
+6. GitHub Pages actualizará krea-3d.store automáticamente.
+
+Productos:
+- Posavasos 3D: 6 imágenes únicas.
+- Abrelatas 3D: 1 imagen.
+- Llavero para foto: 2 imágenes.
+
+Nota:
+Dos fotografías del posavasos eran idénticas, por eso se incluyó solo una copia.
+Los precios quedan como "A coordinar" porque no se proporcionaron precios.
